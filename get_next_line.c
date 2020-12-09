@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/08 16:44:31 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/09 09:37:36 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,6 @@
 
 int		get_next_line(int fd, char **line)
 {
-	char			*buf;
 	char			*lf;
 	t_list			*current_lst;
 	static t_list	*lst;
@@ -25,7 +24,7 @@ int		get_next_line(int fd, char **line)
 	{
 		*line = ft_strdup(current_lst->exstr);
 		if (current_lst->eof_flag)
-			return (-1);
+			return (0);
 		return (my_read(fd, current_lst, line));
 	}
 	*lf = '\0';
@@ -81,7 +80,7 @@ int		my_read(int fd, t_list *lst, char **line)
 
 	read_size = read(fd, buf, BUFFER_SIZE);
 	buf[read_size] = '\0';
-	if (BUFFER_SIZE > read_size)
+	if (read_size < BUFFER_SIZE)
 		lst->eof_flag = 1;
 	if((lf = ft_strchr(buf, '\n')))
 	{
@@ -96,6 +95,6 @@ int		my_read(int fd, t_list *lst, char **line)
 	free(*line);
 	line = &tmp;
 	if (lst->eof_flag)
-		return (-1);
+		return (0);
 	return (my_read(fd, lst, line));
 }

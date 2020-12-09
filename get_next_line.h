@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:12:39 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/08 15:43:54 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/09 09:40:54 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,6 @@
 # include <sys/uio.h>
 # include <unistd.h>
 
-# define BUFFER_SIZE 100
-
 typedef struct	s_list
 {
 	int				fd;
@@ -29,6 +27,7 @@ typedef struct	s_list
 	struct s_list	*next;
 }				t_list;
 
+int		get_next_line(int fd, char **line);
 size_t	ft_strlen(const char *s);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s1);
