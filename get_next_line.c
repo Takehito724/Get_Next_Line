@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/16 19:20:05 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/16 23:28:11 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,9 +29,9 @@ int		get_next_line(int fd, char **line)
 			return (0);
 		return (my_read(fd, current_lst, line));
 	}
-	*lf = '\0';
+	*lf++ = '\0';
 	*line = ft_strdup(current_lst->exstr);
-	tmp = ft_strdup(lf++);
+	tmp = ft_strdup(lf);
 	free(current_lst->exstr);
 	current_lst->exstr = tmp;
 	return (1);
@@ -104,8 +104,8 @@ int		my_read(int fd, t_list *lst, char **line)
 	if((lf = ft_strchr(buf, '\n')))
 	{
 		eol_flag = 1;
-		*lf = '\0';
-		if (!(lst->exstr = ft_strdup(lf++)))
+		*lf++ = '\0';
+		if (!(lst->exstr = ft_strdup(lf)))
 			return (error_processor(line, buf, lst));
 	}
 	if (!(tmp = ft_strjoin(*line, buf)))
@@ -113,7 +113,7 @@ int		my_read(int fd, t_list *lst, char **line)
 	free(*line);
 	free(buf);
 	*line = tmp;
-	if (eol_flag && lst->eof_flag)
+	if (lst->eof_flag && !(eol_flag))
 		return (0);
 	return (eol_flag ? 1 : my_read(fd, lst, line));
 }
