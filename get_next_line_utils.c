@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:08:08 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/08 15:05:55 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/16 18:37:23 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,16 +63,18 @@ char	*ft_strjoin(char const *s1, const char *s2)
 {
 	char	*res;
 	size_t	len;
+	int		i;
 
 	if (s1 == NULL || s2 == NULL)
 		return (NULL);
 	len = ft_strlen(s1) + ft_strlen(s2) + 1;
 	if (!(res = (char *)malloc(len)))
 		return (NULL);
+	i = 0;
 	while (*s1 != '\0')
-		*res++ = *s1++;
+		res[i++] = *s1++;
 	while (*s2 != '\0')
-		*res++ = *s2++;
-	*res = '\0';
+		res[i++] = *s2++;
+	res[i] = '\0';
 	return (res);
 }
