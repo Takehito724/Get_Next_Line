@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:08:08 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/16 18:37:23 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/17 09:35:42 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,14 @@ char	*ft_strdup(const char *s1)
 	size_t		len;
 	size_t		i;
 
+	if (s1 == NULL)
+	{
+		len = 0;
+		if (!(res = (char*)malloc(sizeof(char) * (len + 1))))
+			return (NULL);
+		*res = '\0';
+		return (res);
+	}
 	len = ft_strlen(s1);
 	if (!(res = (char*)malloc(sizeof(char) * (len + 1))))
 		return (NULL);
@@ -47,6 +55,8 @@ char	*ft_strchr(const char *s, int c)
 	char	to_find;
 	size_t	i;
 
+	if (s == NULL)
+		return (NULL);
 	str = (char*)s;
 	to_find = (char)c;
 	i = 0;

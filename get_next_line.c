@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/16 23:28:11 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/17 09:39:29 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,11 @@ int		get_next_line(int fd, char **line)
 	if (!(lf = ft_strchr(current_lst->exstr, '\n')))
 	{
 		if (!(*line = ft_strdup(current_lst->exstr)))
+		{
+			free (current_lst->exstr);
 			return (-1);
+		}
+		free (current_lst->exstr);
 		if (current_lst->eof_flag)
 			return (0);
 		return (my_read(fd, current_lst, line));
@@ -79,9 +83,7 @@ t_list	*list_init(int fd)
 	new->eof_flag = 0;
 	new->prev = NULL;
 	new->next = NULL;
-	if (!(new->exstr = (char*)malloc(sizeof(char))))
-		return (NULL);
-	new->exstr = "";
+	new->exstr = NULL;
 	return (new);
 }
 
@@ -90,7 +92,7 @@ int		my_read(int fd, t_list *lst, char **line)
 	char	*buf;
 	char 	*lf;
 	char	*tmp;
-	int		eol_flag;
+	int		lf_flag;
 	ssize_t	read_size;
 
 	if (!(buf = (char*)malloc(sizeof(char) * BUFFER_SIZE + 1)))
@@ -100,10 +102,10 @@ int		my_read(int fd, t_list *lst, char **line)
 	if (read_size < BUFFER_SIZE)
 		lst->eof_flag = 1;
 	buf[read_size] = '\0';
-	eol_flag = 0;
+	lf_flag = 0;
 	if((lf = ft_strchr(buf, '\n')))
 	{
-		eol_flag = 1;
+		lf_flag = 1;
 		*lf++ = '\0';
 		if (!(lst->exstr = ft_strdup(lf)))
 			return (error_processor(line, buf, lst));
@@ -113,9 +115,9 @@ int		my_read(int fd, t_list *lst, char **line)
 	free(*line);
 	free(buf);
 	*line = tmp;
-	if (lst->eof_flag && !(eol_flag))
+	if (lst->eof_flag && !(lf_flag))
 		return (0);
-	return (eol_flag ? 1 : my_read(fd, lst, line));
+	return 	(lf_flag ? 1 : my_read(fd, lst, line));
 }
 
 int		error_processor(char **line, char *buf, t_list *lst)
