@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:12:39 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/16 16:25:31 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/18 09:52:12 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,12 @@
 # include <sys/uio.h>
 # include <unistd.h>
 
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 2
+# endif
+# define D_SUCCESS 1
+# define D_ERROR -1
+# define D_EOF 0
 typedef struct	s_list
 {
 	int				fd;
@@ -31,10 +37,11 @@ int		get_next_line(int fd, char **line);
 size_t	ft_strlen(const char *s);
 char	*ft_strchr(const char *s, int c);
 char	*ft_strdup(const char *s1);
-char	*ft_strjoin(char const *s1, const char *s2);
+char	*ft_strjoin(char *s1, char *s2);
 t_list	*get_list(int fd, t_list **lst);
 t_list	*list_init(int fd);
 int		my_read(int fd, t_list *lst, char **line);
+void	safe_free(char *s);
 int		error_processor(char **line, char *buf, t_list *lst);
 
 #endif

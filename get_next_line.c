@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/17 09:39:29 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/18 09:51:22 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,31 +14,30 @@
 
 int		get_next_line(int fd, char **line)
 {
-	char			*lf;
+	char			*line_feed;
 	char			*tmp;
 	t_list			*current_lst;
 	static t_list	*lst;
 
 	if (!(current_lst = get_list(fd, &lst)))
-		return (-1);
-	if (!(lf = ft_strchr(current_lst->exstr, '\n')))
+		return (D_ERROR);
+	if (!(line_feed = ft_strchr(current_lst->exstr, '\n')))
 	{
-		if (!(*line = ft_strdup(current_lst->exstr)))
-		{
-			free (current_lst->exstr);
-			return (-1);
-		}
-		free (current_lst->exstr);
-		if (current_lst->eof_flag)
-			return (0);
-		return (my_read(fd, current_lst, line));
+		*line = ft_strdup(current_lst->exstr);
+		safe_free (current_lst->exstr);
+		if (*line == NULL)
+			return (D_ERROR);
+		else if (current_lst->eof_flag)
+			return (D_EOF);
+		else
+			return (my_read(fd, current_lst, line));
 	}
-	*lf++ = '\0';
+	*line_feed = '\0';
 	*line = ft_strdup(current_lst->exstr);
-	tmp = ft_strdup(lf);
+	tmp = ft_strdup(++line_feed);
 	free(current_lst->exstr);
 	current_lst->exstr = tmp;
-	return (1);
+	return (D_SUCCESS);
 }
 
 t_list	*get_list(int fd, t_list **lst)
@@ -49,7 +48,7 @@ t_list	*get_list(int fd, t_list **lst)
 	{
 		if (!(*lst = list_init(fd)))
 			return (NULL);
-		return(*lst);
+		return (*lst);
 	}
 	while (1)
 	{
@@ -90,34 +89,39 @@ t_list	*list_init(int fd)
 int		my_read(int fd, t_list *lst, char **line)
 {
 	char	*buf;
-	char 	*lf;
+	char 	*line_feed;
 	char	*tmp;
-	int		lf_flag;
+	int		line_feed_flag;
 	ssize_t	read_size;
 
+	buf = NULL;
 	if (!(buf = (char*)malloc(sizeof(char) * BUFFER_SIZE + 1)))
-		return(-1);
+		return(error_processor(line, buf, lst));
 	if ((read_size = read(fd, buf, BUFFER_SIZE)) == -1)
-		return (-1);
+		return (error_processor(line, buf, lst));
 	if (read_size < BUFFER_SIZE)
 		lst->eof_flag = 1;
 	buf[read_size] = '\0';
-	lf_flag = 0;
-	if((lf = ft_strchr(buf, '\n')))
+	line_feed_flag = 0;
+	if((line_feed = ft_strchr(buf, '\n')))
 	{
-		lf_flag = 1;
-		*lf++ = '\0';
-		if (!(lst->exstr = ft_strdup(lf)))
+		line_feed_flag = 1;
+		*line_feed = '\0';
+		if (!(lst->exstr = ft_strdup(++line_feed)))
 			return (error_processor(line, buf, lst));
 	}
 	if (!(tmp = ft_strjoin(*line, buf)))
 		return (error_processor(line, buf, lst));
-	free(*line);
-	free(buf);
 	*line = tmp;
-	if (lst->eof_flag && !(lf_flag))
-		return (0);
-	return 	(lf_flag ? 1 : my_read(fd, lst, line));
+	if (lst->eof_flag && !(line_feed_flag))
+		return (D_EOF);
+	return 	(line_feed_flag ? D_SUCCESS : my_read(fd, lst, line));
+}
+
+void	safe_free(char *s)
+{
+	free(s);
+	s = NULL;
 }
 
 int		error_processor(char **line, char *buf, t_list *lst)
@@ -125,5 +129,5 @@ int		error_processor(char **line, char *buf, t_list *lst)
 	free(*line);
 	free(buf);
 	free(lst->exstr);
-	return (-1);
+	return (D_ERROR);
 }
