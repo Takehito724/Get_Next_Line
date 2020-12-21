@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/18 09:51:22 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/21 09:45:40 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,7 @@ int		get_next_line(int fd, char **line)
 	if (!(line_feed = ft_strchr(current_lst->exstr, '\n')))
 	{
 		*line = ft_strdup(current_lst->exstr);
-		safe_free (current_lst->exstr);
+		safe_free(&(current_lst->exstr));
 		if (*line == NULL)
 			return (D_ERROR);
 		else if (current_lst->eof_flag)
@@ -34,9 +34,9 @@ int		get_next_line(int fd, char **line)
 	}
 	*line_feed = '\0';
 	*line = ft_strdup(current_lst->exstr);
-	tmp = ft_strdup(++line_feed);
-	free(current_lst->exstr);
-	current_lst->exstr = tmp;
+	tmp = current_lst->exstr;
+	current_lst->exstr = ft_strdup(line_feed + 1);
+	safe_free(&tmp);
 	return (D_SUCCESS);
 }
 
@@ -44,13 +44,7 @@ t_list	*get_list(int fd, t_list **lst)
 {
 	t_list	*current_lst;
 
-	if (!*lst)
-	{
-		if (!(*lst = list_init(fd)))
-			return (NULL);
-		return (*lst);
-	}
-	while (1)
+	while (*lst)
 	{
 		if ((*lst)->fd == fd)
 		{
@@ -60,16 +54,18 @@ t_list	*get_list(int fd, t_list **lst)
 			return (current_lst);
 		}
 		if ((*lst)->next == NULL)
-			break;
+		{
+			if (!(current_lst = list_init(fd)))
+				return (NULL);
+			(*lst)->next = current_lst;
+			current_lst->prev = (*lst);
+			while ((*lst)->prev)
+				*lst = (*lst)->prev;
+			return (current_lst);
+		}
 		*lst = (*lst)->next;
 	}
-	if (!(current_lst = list_init(fd)))
-		return (NULL);
-	(*lst)->next = current_lst;
-	current_lst->prev = (*lst);
-	while ((*lst)->prev)
-		*lst = (*lst)->prev;
-	return(current_lst);
+	return (list_init(fd));
 }
 
 t_list	*list_init(int fd)
@@ -88,40 +84,35 @@ t_list	*list_init(int fd)
 
 int		my_read(int fd, t_list *lst, char **line)
 {
-	char	*buf;
-	char 	*line_feed;
-	char	*tmp;
-	int		line_feed_flag;
-	ssize_t	read_size;
+	char		*buf;
+	char		*line_feed;
+	char		*tmp;
+	ssize_t		read_size;
 
 	buf = NULL;
 	if (!(buf = (char*)malloc(sizeof(char) * BUFFER_SIZE + 1)))
-		return(error_processor(line, buf, lst));
+		return (error_processor(line, buf, lst));
 	if ((read_size = read(fd, buf, BUFFER_SIZE)) == -1)
 		return (error_processor(line, buf, lst));
 	if (read_size < BUFFER_SIZE)
 		lst->eof_flag = 1;
 	buf[read_size] = '\0';
-	line_feed_flag = 0;
-	if((line_feed = ft_strchr(buf, '\n')))
+	if ((line_feed = ft_strchr(buf, '\n')))
 	{
-		line_feed_flag = 1;
 		*line_feed = '\0';
-		if (!(lst->exstr = ft_strdup(++line_feed)))
+		tmp = lst->exstr;
+		if (!(lst->exstr = ft_strdup(line_feed + 1)))
 			return (error_processor(line, buf, lst));
+		safe_free(&tmp);
 	}
-	if (!(tmp = ft_strjoin(*line, buf)))
+	tmp = *line;
+	if (!(*line = ft_strjoin(*line, buf)))
 		return (error_processor(line, buf, lst));
-	*line = tmp;
-	if (lst->eof_flag && !(line_feed_flag))
+	safe_free(&buf);
+	safe_free(&tmp);
+	if (lst->eof_flag && !(line_feed))
 		return (D_EOF);
-	return 	(line_feed_flag ? D_SUCCESS : my_read(fd, lst, line));
-}
-
-void	safe_free(char *s)
-{
-	free(s);
-	s = NULL;
+	return (line_feed ? D_SUCCESS : my_read(fd, lst, line));
 }
 
 int		error_processor(char **line, char *buf, t_list *lst)

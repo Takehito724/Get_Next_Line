@@ -9,7 +9,7 @@ int		main(void)
 	int		n;
 	char	*line;
 
-	fd = open("fewchar_perline.txt", O_RDONLY);
+	fd = open("64bit_paragraph.txt", O_RDONLY);
 	n = 1;
 	while (res != 0 && res != -1)
 	{

@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:12:39 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/18 09:52:12 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/21 09:34:25 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,7 +41,7 @@ char	*ft_strjoin(char *s1, char *s2);
 t_list	*get_list(int fd, t_list **lst);
 t_list	*list_init(int fd);
 int		my_read(int fd, t_list *lst, char **line);
-void	safe_free(char *s);
+void	safe_free(char **s);
 int		error_processor(char **line, char *buf, t_list *lst);
 
 #endif
