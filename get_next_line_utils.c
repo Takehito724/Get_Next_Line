@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:08:08 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/21 09:36:26 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/23 01:58:11 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,28 +64,30 @@ char	*ft_strchr(const char *s, int c)
 	return (&str[i]);
 }
 
-char	*ft_strjoin(char *s1, char *s2)
+char	*ft_strjoin(char **s1, char **s2)
 {
 	char	*res;
 	size_t	len;
 	int		i;
 	int		j;
 
-	if (s1 == NULL)
-		s1 = ft_strdup(NULL);
-	if (s2 == NULL)
-		s2 = ft_strdup(NULL);
-	len = ft_strlen(s1) + ft_strlen(s2) + 1;
+	if (*s1 == NULL)
+		*s1 = ft_strdup(NULL);
+	if (*s2 == NULL)
+		*s2 = ft_strdup(NULL);
+	len = ft_strlen(*s1) + ft_strlen(*s2) + 1;
 	if (!(res = (char *)malloc(len)))
 		return (NULL);
 	i = 0;
 	j = 0;
-	while (s1[j] != '\0')
-		res[i++] = s1[j++];
+	while ((*s1)[j] != '\0')
+		res[i++] = (*s1)[j++];
 	j = 0;
-	while (s2[j] != '\0')
-		res[i++] = s2[j++];
+	while ((*s2)[j] != '\0')
+		res[i++] = (*s2)[j++];
 	res[i] = '\0';
+	safe_free(s1);
+	safe_free(s2);
 	return (res);
 }
 

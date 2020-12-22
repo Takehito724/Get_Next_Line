@@ -14,11 +14,11 @@ int		main(void)
 	while (res != 0 && res != -1)
 	{
 		res = get_next_line(fd, &line);
-		printf("%d行目：%s\n戻り値：%d\n",n,line,res);
+		printf("%d行目：%s\n戻り値：%d\n", n, line, res);
 		n++;
 		free(line);
 	}
 	close(fd);
-	system ("leaks a.out");
+	system("leaks a.out");
 	return (0);
 }

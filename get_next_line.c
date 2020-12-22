@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/21 09:45:40 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/23 02:19:38 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,29 +15,30 @@
 int		get_next_line(int fd, char **line)
 {
 	char			*line_feed;
-	char			*tmp;
+	char			*buf;
 	t_list			*current_lst;
 	static t_list	*lst;
 
+	if (BUFFER_SIZE <= 0 || fd <= 0)
+		return (D_ERROR);
 	if (!(current_lst = get_list(fd, &lst)))
 		return (D_ERROR);
+	buf = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1));
 	if (!(line_feed = ft_strchr(current_lst->exstr, '\n')))
 	{
 		*line = ft_strdup(current_lst->exstr);
 		safe_free(&(current_lst->exstr));
-		if (*line == NULL)
-			return (D_ERROR);
-		else if (current_lst->eof_flag)
+		if (!*line || !buf)
+			return (error_processor(line, buf, &current_lst));
+		if (current_lst->eof_flag)
 			return (D_EOF);
-		else
-			return (my_read(fd, current_lst, line));
+		return (my_read(fd, buf, current_lst, line));
 	}
 	*line_feed = '\0';
 	*line = ft_strdup(current_lst->exstr);
-	tmp = current_lst->exstr;
+	safe_free(&(current_lst->exstr));
 	current_lst->exstr = ft_strdup(line_feed + 1);
-	safe_free(&tmp);
-	return (D_SUCCESS);
+	return ((*line && current_lst->exstr) ? D_SUCCESS : D_EOF);
 }
 
 t_list	*get_list(int fd, t_list **lst)
@@ -65,7 +66,7 @@ t_list	*get_list(int fd, t_list **lst)
 		}
 		*lst = (*lst)->next;
 	}
-	return (list_init(fd));
+	return ((*lst) = list_init(fd));
 }
 
 t_list	*list_init(int fd)
@@ -82,43 +83,41 @@ t_list	*list_init(int fd)
 	return (new);
 }
 
-int		my_read(int fd, t_list *lst, char **line)
+int		my_read(int fd, char *buf, t_list *lst, char **line)
 {
-	char		*buf;
 	char		*line_feed;
-	char		*tmp;
 	ssize_t		read_size;
 
-	buf = NULL;
-	if (!(buf = (char*)malloc(sizeof(char) * BUFFER_SIZE + 1)))
-		return (error_processor(line, buf, lst));
-	if ((read_size = read(fd, buf, BUFFER_SIZE)) == -1)
-		return (error_processor(line, buf, lst));
-	if (read_size < BUFFER_SIZE)
-		lst->eof_flag = 1;
+	if (!buf)
+		buf = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1));
+	read_size = read(fd, buf, BUFFER_SIZE);
+	if (!buf || read_size == -1)
+		return (error_processor(line, buf, &lst));
+	lst->eof_flag = (read_size < BUFFER_SIZE ? 1 : 0);
 	buf[read_size] = '\0';
 	if ((line_feed = ft_strchr(buf, '\n')))
 	{
 		*line_feed = '\0';
-		tmp = lst->exstr;
+		safe_free(&(lst->exstr));
 		if (!(lst->exstr = ft_strdup(line_feed + 1)))
-			return (error_processor(line, buf, lst));
-		safe_free(&tmp);
+			return (error_processor(line, buf, &lst));
 	}
-	tmp = *line;
-	if (!(*line = ft_strjoin(*line, buf)))
-		return (error_processor(line, buf, lst));
-	safe_free(&buf);
-	safe_free(&tmp);
+	if (!(*line = ft_strjoin(line, &buf)))
+		return (error_processor(line, buf, &lst));
 	if (lst->eof_flag && !(line_feed))
 		return (D_EOF);
-	return (line_feed ? D_SUCCESS : my_read(fd, lst, line));
+	return (line_feed ? D_SUCCESS : my_read(fd, buf, lst, line));
 }
 
-int		error_processor(char **line, char *buf, t_list *lst)
+int		error_processor(char **line, char *buf, t_list **lst)
 {
 	free(*line);
 	free(buf);
-	free(lst->exstr);
+	free((*lst)->exstr);
+	if ((*lst)->prev)
+		(*lst)->prev->next = (*lst)->next;
+	if ((*lst)->next)
+		(*lst)->next->prev = (*lst)->prev;
+	free(*lst);
 	return (D_ERROR);
 }
