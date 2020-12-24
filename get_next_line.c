@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/24 09:02:42 by tkoami           ###   ########.fr       */
+/*   Updated: 2020/12/24 14:45:29 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,14 +30,15 @@ int		get_next_line(int fd, char **line)
 		safe_free(&(current_lst->exstr));
 		if (!*line || !buf)
 			return (error_processor(line, buf, &current_lst));
-		if (current_lst->eof_flag)
-			return (D_EOF);
+		//if (current_lst->eof_flag)
+			//return (D_EOF);
 		return (my_read(fd, buf, current_lst, line));
 	}
 	*line_feed = '\0';
 	*line = ft_strdup(current_lst->exstr);
 	safe_free(&(current_lst->exstr));
 	current_lst->exstr = ft_strdup(line_feed + 1);
+	free(buf);
 	return (D_SUCCESS);
 }
 
