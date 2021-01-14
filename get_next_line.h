@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:12:39 by tkoami            #+#    #+#             */
-/*   Updated: 2020/12/23 02:13:17 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/10 15:06:45 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,6 @@ typedef struct	s_list
 {
 	int				fd;
 	char			*exstr;
-	int				eof_flag;
 	struct s_list	*prev;
 	struct s_list	*next;
 }				t_list;
@@ -38,10 +37,10 @@ int				get_next_line(int fd, char **line);
 size_t			ft_strlen(const char *s);
 char			*ft_strchr(const char *s, int c);
 char			*ft_strdup(const char *s1);
-char			*ft_strjoin(char **s1, char **s2);
+char			*ft_strjoin(char *s1, char *s2);
 t_list			*get_list(int fd, t_list **lst);
 t_list			*list_init(int fd);
-int				my_read(int fd, char *buf, t_list *lst, char **line);
+int				my_read(int fd, char **buf, t_list *lst, char **line);
 void			safe_free(char **s);
 int				error_processor(char **line, char *buf, t_list **lst);
 
