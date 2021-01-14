@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2021/01/14 17:08:18 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/14 17:26:47 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -93,6 +93,7 @@ int		my_read(int fd, char **buf, t_list *lst, char **line)
 	while ((rc = read(fd, *buf, BUFFER_SIZE)) > 0)
 	{
 		(*buf)[rc] = '\0';
+		safe_free(&(lst->exstr));
 		if ((line_feed = ft_strchr(*buf, '\n')))
 		{
 			*line_feed = '\0';
