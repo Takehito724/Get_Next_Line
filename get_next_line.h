@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/28 18:12:39 by tkoami            #+#    #+#             */
-/*   Updated: 2021/01/10 15:06:45 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/14 17:01:31 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,6 @@ t_list			*get_list(int fd, t_list **lst);
 t_list			*list_init(int fd);
 int				my_read(int fd, char **buf, t_list *lst, char **line);
 void			safe_free(char **s);
-int				error_processor(char **line, char *buf, t_list **lst);
+int				error_processor(char **line, char *buf, t_list **lst, int res);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2021/01/14 15:22:00 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/14 17:08:18 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,7 +29,7 @@ int		get_next_line(int fd, char **line)
 	if ((line_feed = ft_strchr(current_lst->exstr, '\n')))
 		*line_feed = '\0';
 	if (!(*line = ft_strdup(current_lst->exstr)))
-		error_processor(line, buf, &current_lst);
+		error_processor(line, buf, &current_lst, D_ERROR);
 	if (line_feed)
 	{
 		line_feed = ft_strdup(line_feed + 1);
@@ -38,9 +38,9 @@ int		get_next_line(int fd, char **line)
 		rc = 1;
 	}
 	else if ((rc = my_read(fd, &buf, current_lst, line)) < 0)
-		return (error_processor(line, buf, &(current_lst)));
-	free(buf);
-	return (rc ? D_SUCCESS : D_EOF);
+		return (error_processor(line, buf, &current_lst, D_ERROR));
+	safe_free(&buf);
+	return (rc ? D_SUCCESS : error_processor(line, buf, &current_lst, D_EOF));
 }
 
 t_list	*get_list(int fd, t_list **lst)
@@ -97,24 +97,25 @@ int		my_read(int fd, char **buf, t_list *lst, char **line)
 		{
 			*line_feed = '\0';
 			if (!(lst->exstr = ft_strdup(line_feed + 1)))
-				return (error_processor(line, *buf, &lst));
+				return (error_processor(line, *buf, &lst, D_ERROR));
 			tmp = *line;
 			if (!(*line = ft_strjoin(tmp, *buf)))
-				return (error_processor(line, *buf, &lst));
+				return (error_processor(line, *buf, &lst, D_ERROR));
 			safe_free(&tmp);
 			return (rc);
 		}
 		tmp = *line;
 		if (!(*line = ft_strjoin(tmp, *buf)))
-			return (error_processor(line, *buf, &lst));
+			return (error_processor(line, *buf, &lst, D_ERROR));
 		safe_free(&tmp);
 	}
 	return (rc);
 }
 
-int		error_processor(char **line, char *buf, t_list **lst)
+int		error_processor(char **line, char *buf, t_list **lst, int res)
 {
-	free(*line);
+	if (res == -1)
+		free(*line);
 	free(buf);
 	free((*lst)->exstr);
 	if ((*lst)->prev)
@@ -122,5 +123,5 @@ int		error_processor(char **line, char *buf, t_list **lst)
 	if ((*lst)->next)
 		(*lst)->next->prev = (*lst)->prev;
 	free(*lst);
-	return (D_ERROR);
+	return (res);
 }
