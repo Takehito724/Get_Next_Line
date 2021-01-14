@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2021/01/14 13:33:24 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/14 15:13:52 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,6 @@ int		get_next_line(int fd, char **line)
 		return (D_ERROR);
 	if (!(buf = (char*)malloc(sizeof(char) * (BUFFER_SIZE + 1))))
 		return (D_ERROR);
-	if ((line_feed = ft_strchr(current_lst->exstr, '\n')))
-		*line_feed = '\0';
 	if (!(*line = ft_strdup(current_lst->exstr)))
 		error_processor(line, buf, &current_lst);
 	if (line_feed)
@@ -35,12 +33,11 @@ int		get_next_line(int fd, char **line)
 		line_feed = ft_strdup(line_feed + 1);
 		safe_free(&(current_lst->exstr));
 		current_lst->exstr = line_feed;
-		safe_free(&buf);
-		return (D_SUCCESS);
+		rc = 1;
 	}
-	if ((rc = my_read(fd, &buf, current_lst, line)) < 0)
+	else if ((rc = my_read(fd, &buf, current_lst, line)) < 0)
 		return (error_processor(line, buf, &(current_lst)));
-	safe_free(&buf);
+	free(buf);
 	return (rc ? D_SUCCESS : D_EOF);
 }
 
