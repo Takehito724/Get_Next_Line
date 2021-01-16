@@ -6,7 +6,7 @@
 /*   By: tkoami <tkoami@student.42tokyo.jp>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/27 17:25:31 by tkoami            #+#    #+#             */
-/*   Updated: 2021/01/15 09:39:24 by tkoami           ###   ########.fr       */
+/*   Updated: 2021/01/16 10:03:34 by tkoami           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,10 +46,12 @@ t_list	*get_list(int fd, t_list *lst)
 {
 	t_list *new;
 	
-	while (lst && lst->next)
+	while (lst)
 	{
 		if (lst->fd == fd)
 			return lst;
+		if (lst->next == NULL)
+			break;
 		lst = lst->next;
 	}
 	if (!(new = (t_list*)malloc(sizeof(t_list))))
